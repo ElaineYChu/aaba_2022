@@ -1,0 +1,5 @@
+"type","type2","p_accuracy","rmse","see","model"
+"sixvar","cdep",84.6153846153846,"2.4712133966732","+/- 4.35","sixvar_cdep"
+"sixvar","cindep",80,"2.44186291621402","+/- 4.29","sixvar_cindep"
+"allvar","cdep",64.6788990825688,"1.41615479226764","+/- 2.73","allvar_cdep"
+"allvar","cindep",40.2298850574713,"2.53067858352017","+/- 4.21","allvar_cindep"
