@@ -4,13 +4,13 @@ title: 'Advances in Subadult Age Estimation: Evaluating the Performance of the M
 author: "Elaine Y. Chu"
 date: "March 2022"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 subtitle: AABA - Denver, CO
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning=FALSE, fig.path='figures/', fig.ext='png', dpi=300)
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, fig.path='figures/', fig.ext='png', dpi=180)
 ```
 
 # Objective
@@ -336,24 +336,37 @@ ggplot(train) + geom_bar(aes(x=as.integer(agey), fill=SEX)) +
 
 ```
 
-### Slides 13-15
+### Slides 14-16
 ```{r univariate_bias, fig.height=10, fig.width=10}
 uni_tests <- read.csv("uni_results/univariate_predictions_combined.csv")
 uni_tests %<>% mutate(type2=ifelse(grepl("PB|MSB|DB",uni_tests$var),"Breadth",
                                    ifelse(grepl("DL",uni_tests$var),"Length",
                                           "NA")))
 
-## Bias
+## Bias1
 ggplot(uni_tests) + 
   geom_smooth(aes(x=known_age, y=resid, group=var, color=type2), se=F) + 
   scale_color_manual(values=c("grey85",aaba_colors_2022[4],"grey85")) + 
   elaine_theme + labs(x="Age [years]", y="Bias") + 
-  geom_smooth(aes(x=known_age, y=abs_resid), se=F, 
+  geom_smooth(aes(x=known_age, y=resid), se=F, 
               color=aaba_colors_2022[1]) + 
   geom_hline(yintercept=0, linetype="dashed") + 
   facet_wrap(~type) + theme(legend.position="none") + 
   theme(strip.text=element_text(size=20),
         axis.title=element_text(size=20))
+
+## Bias2
+uni_tests2 <- uni_tests[-grep('PB|MSB|DB',uni_tests$var),]
+ggplot(uni_tests2) + 
+  geom_smooth(aes(x=known_age, y=resid, group=var), color="grey85", se=F) + 
+  elaine_theme + labs(x="Age [years]", y="Bias") + 
+  geom_smooth(aes(x=known_age, y=resid), se=F, 
+              color=aaba_colors_2022[1]) + 
+  geom_hline(yintercept=0, linetype="dashed") + 
+  facet_wrap(~type) + theme(legend.position="none") + 
+  theme(strip.text=element_text(size=20),
+        axis.title=element_text(size=20))
+
 ```
 
 ```{r univariate_accuracy, fig.width=10, fig.height=10}
@@ -369,10 +382,21 @@ ggplot(uni_tests) +
   theme(strip.text=element_text(size=20),
         axis.title=element_text(size=20))
 
+## Accuracy2
+ggplot(uni_tests2) + 
+  geom_smooth(aes(x=known_age, y=abs_resid, group=var), color="grey85", se=F) + 
+  elaine_theme + labs(x="Age [years]", y="Accuracy") + 
+  geom_smooth(aes(x=known_age, y=abs_resid), se=F, 
+              color=aaba_colors_2022[1]) + 
+  geom_hline(yintercept=0, linetype="dashed") + 
+  facet_wrap(~type) + theme(legend.position="none") + 
+  theme(strip.text=element_text(size=20),
+        axis.title=element_text(size=20))
+
 ```
 
 
-### Slide 16
+### Slide 17
 ```{r univariate_p-accuracy, fig.width=10, fig.height=6}
 uni_perf <- read.csv("uni_results/univariate_model_performance.csv")
 uni_perf$p_accuracy <- uni_perf$p_accuracy*100  # convert to percentage
@@ -392,7 +416,7 @@ ggplot(uni_perf2 %>% arrange(p_accuracy) %>%
         axis.text=element_text(size=6))
 ```
 
-### Slide 17
+### Slide 18
 ```{r univariate_ranges, fig.width=10, fig.height=6}
 uni_pred <- read.csv("uni_results/univariate_predictions_combined.csv")
 uni_pred2 <- uni_pred[-grep('PB|MSB|DB',uni_pred$var),]
@@ -413,7 +437,7 @@ ggplot(uni_summary) +
 ```
 
 
-### Slide 19
+### Slide 20
 ```{r multivariate_bias, fig.width=10, fig.height=10}
 multi_pred <- read.csv('multi_results/multivariate_predictions_combined.csv')
 
@@ -438,8 +462,8 @@ ggplot(multi_pred) +
         axis.title=element_text(size=20))
 ```
 
-### Slide 20
-```{r multivariate_p-accuracy, fig.width=10, fig.height=8}
+### Slide 21
+```{r multivariate_p-accuracy, fig.width=10, fig.height=6}
 multi_perf <- read.csv('multi_results/multivariate_model_performance.csv')
 
 ## Percent Accuracy
@@ -457,8 +481,8 @@ ggplot(multi_perf) +
 
 ```
 
-## Slide 21
-```{r multivariate_ranges, fig.width=10, fig.height=8}
+## Slide 22
+```{r multivariate_ranges, fig.width=10, fig.height=6}
 multi_pred %<>% mutate(model=paste0(type,'_',type2))
 multi_summary <- multi_pred %>% group_by(model, agey=as.integer(known_age)) %>%
   summarize(point=mean(point_est),lower95=mean(lower95),upper95=mean(upper95))
