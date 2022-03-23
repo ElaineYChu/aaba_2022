@@ -235,27 +235,22 @@ write.csv(df, "uni_results/univariate_model_performance.csv", row.names=F)
 For the multivariate models, a similar format into *multivariate_model_performance.csv*:
 
 ```{r Multivariate Performance, eval=FALSE}
-allvar_cindep <- read.csv('multi_results/US_allvar_cindep_model_test_predictions.csv')
-allvar_cdep <- read.csv('multi_results/US_allvar_cdep_model_test_predictions.csv')
-sixvar_cindep <- read.csv('multi_results/US_sixvar_cindep_model_test_predictions.csv')
-sixvar_cdep <- read.csv('multi_results/US_sixvar_cdep_model_test_predictions.csv')
+# Find all multivariate prediction files
+multi_files <- list.files('multi_results','_test_predictions.csv')
+type <- c(rep("allvar",2),rep("sixvar",2))
+type2 <- rep(c("cdep","cindep"),2)
 
-df_list <- list(sixvar_cdep,
-                sixvar_cindep,
-                allvar_cdep,
-                allvar_cindep)
-temp <- data.frame(matrix(nrow=length(df_list),
-                          ncol=5))
+# Temporary dataframe
+temp <- data.frame(matrix(nrow=length(multi_files),ncol=5))
 names(temp) <- c('type','type2','p_accuracy','rmse','see')
 
-
-for(i in 1:length(df_list)) {
-  df0 <- df_list[[i]]
-  type0 <- df0$type[1]
-  type02 <- df0$type2[1]
-  p_accuracy0 <- calc_perf(df0,"%accuracy")
-  rmse0 <- calc_perf(df0,"rmse")
-  see0 <- calc_perf(df0,"SEE")
+for(i in 1:length(multi_files)) {
+  var0 <- gsub("_test_predictions.csv","",multi_files[i])
+  p_accuracy0 <- calc_perf("multi_results",multi_files[i],"%accuracy")
+  rmse0 <- calc_perf("multi_results",multi_files[i],"rmse")
+  see0 <- calc_perf("multi_results",multi_files[i],"SEE")
+  type0 <- type[i]
+  type02 <- type2[i]
   
   row0 <- c(type0,type02,p_accuracy0,rmse0,see0)
   temp[i,] <- row0
@@ -265,13 +260,12 @@ temp %<>% mutate(model=paste0(type,'_',type2))
 temp$p_accuracy <- as.numeric(temp$p_accuracy)*100
 temp$model <- factor(temp$model, levels=c('sixvar_cdep','sixvar_cindep',
                                           'allvar_cdep','allvar_cindep'))
-write.csv(temp, 'multi_results/multivariate_performance.csv', row.names=F)
+write.csv(temp, 'multi_results/multivariate_model_performance.csv', row.names=F)
 
 ```
 
 
 ```{r Univariate Performance by Age, eval=FALSE, include=FALSE}
-
 uni_pred <- read.csv("uni_results/univariate_predictions_combined.csv")
 uni_pred$agey <- as.integer(uni_pred$known_age)
 age_vec <- sort(unique(uni_pred$agey))
